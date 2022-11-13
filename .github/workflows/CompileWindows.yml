@@ -1,4 +1,4 @@
-name: CompileWindowsDummy
+name: CompileWindows
 
 on:
   # pull_request:
