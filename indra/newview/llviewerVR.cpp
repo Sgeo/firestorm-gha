@@ -821,117 +821,116 @@ bool llviewerVR::ProcessVRCamera()
 
 		
 
-		if (!leftEyeDesc.IsReady && !rightEyeDesc.IsReady)//Starting rendering with first (left) eye of stereo rendering
-		{
+
 			
-			
-			//Set the windows max size and aspect ratio to fit with the HMD.
-#ifdef _WIN32
-			int scrsize = GetSystemMetrics(SM_CYSCREEN);
-			if (GetSystemMetrics(SM_CXSCREEN) < scrsize)
-				scrsize = GetSystemMetrics(SM_CXSCREEN);
-#else
-    int scrsize = 1080;
-#endif
-			LLWindow * WI;
-			WI = gViewerWindow->getWindow();
-			WI->getCursorPosition(&m_MousePos);
-			
-			LLCoordWindow m_ScrSize;
-			LLCoordWindow m_ScrSizeOld;
 		
-			WI->getSize(&m_ScrSizeOld);
-			float mult = (float)m_nRenderWidth / (float)m_nRenderHeight;
-			if (m_nRenderHeight<m_nRenderWidth)
-			mult = (float)m_nRenderHeight / (float)m_nRenderWidth;
-			
-			m_ScrSize.mX = (scrsize*mult)*0.95;
-			m_ScrSize.mY = (scrsize)*0.95;
-			if (m_ScrSizeOld.mX != m_ScrSize.mX || m_ScrSizeOld.mY != m_ScrSize.mY)
-			{
-				m_ScrSize.set(m_ScrSize.mX, m_ScrSize.mY);
-				WI->setSize(m_ScrSize);
-			}
-			//Constrain the cursor to the viewer window.
-			if (m_MousePos.mX >= m_ScrSize.mX)
-				m_MousePos.mX = m_ScrSize.mX - 1;
-			else if (m_MousePos.mX < 1)
-				m_MousePos.mX = 1;
-			if (m_MousePos.mY >= m_ScrSize.mY)
-				m_MousePos.mY = m_ScrSize.mY - 1;
-			else if (m_MousePos.mY < 1)
-				m_MousePos.mY = 1;
-
-			m_iHalfWidth = m_ScrSize.mX / 2;
-			m_iHalfHeight = m_ScrSize.mY / 2;
-			m_iThirdWidth = m_ScrSize.mX / 3;
-			m_iThirdHeight = m_ScrSize.mY / 3;
-			
-
-			//Store current camera values
-			m_vdir_orig = LLViewerCamera::getInstance()->getAtAxis();
-			m_vleft_orig = LLViewerCamera::getInstance()->getLeftAxis();
-			m_vup_orig = LLViewerCamera::getInstance()->getUpAxis();
-			m_vpos_orig = LLViewerCamera::getInstance()->getOrigin();
-			
-			if (!m_bEditActive)// unlock HMD's rotation input.
-			{
-				glh::matrix4f slCameraMatrix(
-					m_vdir_orig[0], m_vleft_orig[0], m_vup_orig[0], m_vpos_orig[0],
-					m_vdir_orig[1], m_vleft_orig[1], m_vup_orig[1], m_vpos_orig[1],
-					m_vdir_orig[2], m_vleft_orig[2], m_vup_orig[2], m_vpos_orig[2],
-					           0.0,             0.0,           0.0,            1.0
-				);
-
-				glh::matrix4f eyeLocation = glh::matrix4f::identity();
-				if (!leftEyeDesc.IsReady) // Rendering left eye
-				{
-					eyeLocation = ConvertSteamVRMatrixToMatrix42(gHMD->GetEyeToHeadTransform(vr::Eye_Left));
-				}
-				else if (!rightEyeDesc.IsReady) // Rendering right eye
-				{
-					eyeLocation = ConvertSteamVRMatrixToMatrix42(gHMD->GetEyeToHeadTransform(vr::Eye_Right));
-				}
-
-				glh::matrix4f newCameraMatrix = slCameraMatrix * m_mat4HMDPose * eyeLocation;
-
-				LLViewerCamera::getInstance()->setAxes(
-					LLVector3(newCameraMatrix.element(0, 0), newCameraMatrix.element(1, 0), newCameraMatrix.element(2, 0)),
-					LLVector3(newCameraMatrix.element(0, 1), newCameraMatrix.element(1, 1), newCameraMatrix.element(2, 1)),
-					LLVector3(newCameraMatrix.element(0, 2), newCameraMatrix.element(1, 2), newCameraMatrix.element(2, 2))
-				);
-				LLViewerCamera::getInstance()->setOrigin(
-					newCameraMatrix.element(0, 3), newCameraMatrix.element(1, 3), newCameraMatrix.element(2, 3)
-				);
-			}
-			else //lock HMD's rotation input for inworld object editing purposes.
-			{
-				m_vdir = m_vdir_orig;
-				m_vup = m_vup_orig;
-				m_vleft = m_vleft_orig;
-				m_vpos = m_vpos_orig;
-			}
-
-			
-			if (m_iMenuIndex)
-			{
-				hud_textp->setString(Settings());
-				LLVector3 end = m_vpos + m_vdir * 1.0f;
-				hud_textp->setPositionAgent(end);
-				hud_textp->setDoFade(FALSE);
-				hud_textp->setHidden(FALSE);
-				
-
-				
-			}
-			else if (m_bDebugKeyDown)
-			{
-				Debug();
-			}
-			else
-				hud_textp->setHidden(TRUE);
-
+		//Set the windows max size and aspect ratio to fit with the HMD.
+#ifdef _WIN32
+		int scrsize = GetSystemMetrics(SM_CYSCREEN);
+		if (GetSystemMetrics(SM_CXSCREEN) < scrsize)
+			scrsize = GetSystemMetrics(SM_CXSCREEN);
+#else
+int scrsize = 1080;
+#endif
+		LLWindow * WI;
+		WI = gViewerWindow->getWindow();
+		WI->getCursorPosition(&m_MousePos);
+		
+		LLCoordWindow m_ScrSize;
+		LLCoordWindow m_ScrSizeOld;
+	
+		WI->getSize(&m_ScrSizeOld);
+		float mult = (float)m_nRenderWidth / (float)m_nRenderHeight;
+		if (m_nRenderHeight<m_nRenderWidth)
+		mult = (float)m_nRenderHeight / (float)m_nRenderWidth;
+		
+		m_ScrSize.mX = (scrsize*mult)*0.95;
+		m_ScrSize.mY = (scrsize)*0.95;
+		if (m_ScrSizeOld.mX != m_ScrSize.mX || m_ScrSizeOld.mY != m_ScrSize.mY)
+		{
+			m_ScrSize.set(m_ScrSize.mX, m_ScrSize.mY);
+			WI->setSize(m_ScrSize);
 		}
+		//Constrain the cursor to the viewer window.
+		if (m_MousePos.mX >= m_ScrSize.mX)
+			m_MousePos.mX = m_ScrSize.mX - 1;
+		else if (m_MousePos.mX < 1)
+			m_MousePos.mX = 1;
+		if (m_MousePos.mY >= m_ScrSize.mY)
+			m_MousePos.mY = m_ScrSize.mY - 1;
+		else if (m_MousePos.mY < 1)
+			m_MousePos.mY = 1;
+
+		m_iHalfWidth = m_ScrSize.mX / 2;
+		m_iHalfHeight = m_ScrSize.mY / 2;
+		m_iThirdWidth = m_ScrSize.mX / 3;
+		m_iThirdHeight = m_ScrSize.mY / 3;
+		
+
+		//Store current camera values
+		m_vdir_orig = LLViewerCamera::getInstance()->getAtAxis();
+		m_vleft_orig = LLViewerCamera::getInstance()->getLeftAxis();
+		m_vup_orig = LLViewerCamera::getInstance()->getUpAxis();
+		m_vpos_orig = LLViewerCamera::getInstance()->getOrigin();
+		
+		if (!m_bEditActive)// unlock HMD's rotation input.
+		{
+			glh::matrix4f slCameraMatrix(
+				m_vdir_orig[0], m_vleft_orig[0], m_vup_orig[0], m_vpos_orig[0],
+				m_vdir_orig[1], m_vleft_orig[1], m_vup_orig[1], m_vpos_orig[1],
+				m_vdir_orig[2], m_vleft_orig[2], m_vup_orig[2], m_vpos_orig[2],
+							0.0,             0.0,           0.0,            1.0
+			);
+
+			glh::matrix4f eyeLocation = glh::matrix4f::identity();
+			if (!leftEyeDesc.IsReady) // Rendering left eye
+			{
+				eyeLocation = ConvertSteamVRMatrixToMatrix42(gHMD->GetEyeToHeadTransform(vr::Eye_Left));
+			}
+			else if (!rightEyeDesc.IsReady) // Rendering right eye
+			{
+				eyeLocation = ConvertSteamVRMatrixToMatrix42(gHMD->GetEyeToHeadTransform(vr::Eye_Right));
+			}
+
+			glh::matrix4f newCameraMatrix = slCameraMatrix * m_mat4HMDPose * eyeLocation;
+
+			LLViewerCamera::getInstance()->setAxes(
+				LLVector3(newCameraMatrix.element(0, 0), newCameraMatrix.element(1, 0), newCameraMatrix.element(2, 0)),
+				LLVector3(newCameraMatrix.element(0, 1), newCameraMatrix.element(1, 1), newCameraMatrix.element(2, 1)),
+				LLVector3(newCameraMatrix.element(0, 2), newCameraMatrix.element(1, 2), newCameraMatrix.element(2, 2))
+			);
+			LLViewerCamera::getInstance()->setOrigin(
+				newCameraMatrix.element(0, 3), newCameraMatrix.element(1, 3), newCameraMatrix.element(2, 3)
+			);
+		}
+		else //lock HMD's rotation input for inworld object editing purposes.
+		{
+			m_vdir = m_vdir_orig;
+			m_vup = m_vup_orig;
+			m_vleft = m_vleft_orig;
+			m_vpos = m_vpos_orig;
+		}
+
+		
+		if (m_iMenuIndex)
+		{
+			hud_textp->setString(Settings());
+			LLVector3 end = m_vpos + m_vdir * 1.0f;
+			hud_textp->setPositionAgent(end);
+			hud_textp->setDoFade(FALSE);
+			hud_textp->setHidden(FALSE);
+			
+
+			
+		}
+		else if (m_bDebugKeyDown)
+		{
+			Debug();
+		}
+		else
+			hud_textp->setHidden(TRUE);
+
+
 		
 
 
