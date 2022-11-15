@@ -868,10 +868,14 @@ int scrsize = 1080;
 		
 
 		//Store current camera values
-		m_vdir_orig = LLViewerCamera::getInstance()->getAtAxis();
-		m_vleft_orig = LLViewerCamera::getInstance()->getLeftAxis();
-		m_vup_orig = LLViewerCamera::getInstance()->getUpAxis();
-		m_vpos_orig = LLViewerCamera::getInstance()->getOrigin();
+		//Only when processing left eye.
+		//Right eye should not use left eye's information as its original camera values
+		if(!leftEyeDesc.IsReady) {
+			m_vdir_orig = LLViewerCamera::getInstance()->getAtAxis();
+			m_vleft_orig = LLViewerCamera::getInstance()->getLeftAxis();
+			m_vup_orig = LLViewerCamera::getInstance()->getUpAxis();
+			m_vpos_orig = LLViewerCamera::getInstance()->getOrigin();
+		}
 		
 		if (!m_bEditActive)// unlock HMD's rotation input.
 		{
