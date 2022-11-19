@@ -1607,17 +1607,13 @@ void llviewerVR::RenderControllerAxes()
 		LLVector3 up;
 		LLVector3 left;
 		
-		glh::ns_float::vec4 row = mat.get_row(2);
-		dir.setVec(row.v[0], -row.v[2], row.v[1]);
+		dir.setVec(mat.element(0, 2), mat.element(1, 2), mat.element(2, 2));
 
-		row = mat.get_row(1);
-		up.setVec(row.v[0], -row.v[2], row.v[1]);
+		up.setVec(mat.element(0, 1), mat.element(1, 1), mat.element(2, 1));
 
-		row = mat.get_row(0);
-		left.setVec(row.v[0], -row.v[2], row.v[1]);
+		left.setVec(mat.element(0, 0), mat.element(1, 0), mat.element(2, 0));
 
-		row = mat.get_row(3);
-		gCtrlOrigin[unTrackedDevice].setVec(row.v[0], -row.v[2], row.v[1]);
+		gCtrlOrigin[unTrackedDevice].setVec(mat.element(0, 3), mat.element(1, 3), mat.element(2, 3));
 
 		LLQuaternion q1(dir, left, up);
 		
